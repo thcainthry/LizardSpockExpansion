@@ -51,7 +51,7 @@ fun HandGestureScreen(
             uiState.mostRecentGesture?.forEach {
                 Text(
                     text = it,
-                    fontSize = 32.sp
+                    fontSize = 30.sp
                 )
             }
         }
