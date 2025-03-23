@@ -60,9 +60,19 @@ fun HandGestureScreen(
                 .onGloballyPositioned { layoutCoordinates ->
                     canvasSize = layoutCoordinates.size
                 }) {
-                uiState.handBoundingBoxes.forEach { rect ->
+                uiState.handBoundingBoxes.forEachIndexed { index, rect ->
+                    val gesture = uiState.mostRecentGesture?.getOrNull(index) ?: ""
+                    val opponentGesture =
+                        uiState.mostRecentGesture?.getOrNull((index + 1) % uiState.mostRecentGesture!!.size)
+                            ?: ""
+                    val result = determineWinner(gesture, opponentGesture)
+                    val color = when (gesture) {
+                        result?.first -> Color(0xFF0DFF25) // Winner
+                        result?.second -> Color(0xFFFF0D0D) // Loser
+                        else -> Color(0xFF0071FF) // Default
+                    }
                     drawRect(
-                        color = Color(0xFF0DFF25),
+                        color = color,
                         topLeft = Offset(
                             (rect.left.toFloat() / width) * size.width,
                             (rect.top.toFloat() / height) * size.height
@@ -98,5 +108,22 @@ fun HandGestureScreen(
                     }
                 }
         }
+    }
+}
+
+fun determineWinner(firstGesture: String, secondGesture: String): Pair<String, String>? {
+    val rules = mapOf(
+        "Scissors" to listOf("Paper", "Lizard"),
+        "Paper" to listOf("Rock", "Spock"),
+        "Rock" to listOf("Lizard", "Scissors"),
+        "Lizard" to listOf("Spock", "Paper"),
+        "Spock" to listOf("Scissors", "Rock")
+    )
+
+    return when {
+        firstGesture == secondGesture -> null
+        rules[firstGesture]?.contains(secondGesture) == true -> firstGesture to secondGesture
+        rules[secondGesture]?.contains(firstGesture) == true -> secondGesture to firstGesture
+        else -> null
     }
 }
