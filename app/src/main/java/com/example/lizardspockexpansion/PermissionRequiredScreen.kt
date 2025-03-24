@@ -24,11 +24,14 @@ fun PermissionRequiredScreen(
     permission: String,
     onPermissionGranted: () -> Unit
 ) {
+    var text by remember { mutableStateOf("Requesting permission...") }
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
             onPermissionGranted()
+        }else{
+            text = "We kind of needed permission to the camera!"
         }
     }
     LaunchedEffect(Unit) {
@@ -37,7 +40,7 @@ fun PermissionRequiredScreen(
 
     Box(modifier = modifier.fillMaxSize()) {
         Text(
-            text = "Requesting permission...",
+            text = text,
             modifier = modifier.align(Alignment.Center)
         )
     }
